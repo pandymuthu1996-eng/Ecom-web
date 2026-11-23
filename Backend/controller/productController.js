@@ -1,5 +1,6 @@
 import Product from '../models/productmodels.js';
 import HandleError from '../helper/handleError.js';
+import ApiHelper from '../helper/apiHelper.js';
 
 // create products route
 export const addProduct = async (req, res, next) => {
@@ -85,12 +86,14 @@ export const deleteProduct = async (req,res,next) => {
 
 
 // get all products route
-export const getAllProducts = async(req, res) => {
+export const getAllProducts = async(req, res, next) => {
     try {
-        const products = await Product.find();
+
+        const apiHelper = new ApiHelper(Product.find(), req.query).search();
+        const products = await apiHelper.query;
         res.status(200).json({ success: true, message: 'Products fetched successfully', products });
     } catch (error) {
-        // res.status(500).json({ success: false, message: 'Error fetching products', error });
+       
         next(error);  // Pass the error to the error handling middleware instead of sending a response directly
     }
 };
